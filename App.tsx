@@ -22,9 +22,6 @@ import { Buffer } from 'buffer';
 import {
   Camera,
   useCameraDevices,
-  useFrameProcessor,
-  runOnUI,
-  runOnJS,
 } from 'react-native-vision-camera';
 
 const INPUT_WIDTH = 160;
