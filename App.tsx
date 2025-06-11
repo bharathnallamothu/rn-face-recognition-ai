@@ -241,19 +241,10 @@ const App = () => {
             <TouchableOpacity style={styles.controlButton} onPress={toggleFlash}>
               <Text style={styles.controlText}>⚡ {flashMode}</Text>
             </TouchableOpacity>
-            <TouchableOpacity style={styles.controlButton} onPress={toggleRealTimeMatching}>
-              <Text style={styles.controlText}>{realTimeMatching ? '🔴 Live' : '⚫ Static'}</Text>
-            </TouchableOpacity>
             <TouchableOpacity style={styles.controlButton} onPress={toggleCamera}>
               <Text style={styles.controlText}>✕</Text>
             </TouchableOpacity>
           </View>
-
-          {lastMatchResult && (
-            <View style={styles.matchResultOverlay}>
-              <Text style={styles.matchResultText}>{lastMatchResult}</Text>
-            </View>
-          )}
 
           <View style={styles.bottomControls}>
             <TouchableOpacity style={styles.secondaryButton} onPress={switchCamera}>
