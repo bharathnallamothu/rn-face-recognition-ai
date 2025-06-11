@@ -31,6 +31,8 @@ const INPUT_WIDTH = 160;
 const INPUT_HEIGHT = 160;
 const REFERENCE_IMAGE_URL = 'https://ctrlfaceapiimages.s3.ap-south-1.amazonaws.com/2.jpeg';
 
+const { width: screenWidth, height: screenHeight } = Dimensions.get('window');
+
 const App = () => {
   const [session, setSession] = useState<ort.InferenceSession | null>(null);
   const [refEmbedding, setRefEmbedding] = useState<Float32Array | null>(null);
