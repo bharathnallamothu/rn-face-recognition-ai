@@ -52,27 +52,49 @@ const App = () => {
   const cameraRef = useRef<Camera>(null);
 
   useEffect(() => {
-    (async () => {
-      try {
-        const modelName = 'faceNet.onnx';
-        const modelPath = `${RNFS.DocumentDirectoryPath}/${modelName}`;
-        if (!(await RNFS.exists(modelPath))) {
-          await RNFS.copyFileAssets(modelName, modelPath);
-        }
-        const loaded = await ort.InferenceSession.create(modelPath);
-        setSession(loaded);
-        console.log('✅ ONNX model loaded');
-
-        const refPath = `${RNFS.DocumentDirectoryPath}/ref.jpg`;
-        await RNFS.downloadFile({ fromUrl: REFERENCE_IMAGE_URL, toFile: refPath }).promise;
-
-        const embedding = await detectAndRun(loaded, refPath, setRefFaceUri);
-        if (embedding) setRefEmbedding(embedding);
-      } catch (err) {
-        console.error('❌ Init failed', err);
-      }
-    })();
+    requestCameraPermission();
+    initializeModel();
   }, []);
+
+  const requestCameraPermission = async () => {
+    if (Platform.OS === 'android') {
+      const granted = await PermissionsAndroid.request(
+        PermissionsAndroid.PERMISSIONS.CAMERA,
+        {
+          title: 'Camera Permission',
+          message: 'This app needs camera access for face recognition',
+          buttonNeutral: 'Ask Me Later',
+          buttonNegative: 'Cancel',
+          buttonPositive: 'OK',
+        }
+      );
+      setCameraPermission(granted === PermissionsAndroid.RESULTS.GRANTED ? 'granted' : 'denied');
+    } else {
+      const permission = await Camera.requestCameraPermission();
+      setCameraPermission(permission);
+    }
+  };
+
+  const initializeModel = async () => {
+    try {
+      const modelName = 'faceNet.onnx';
+      const modelPath = `${RNFS.DocumentDirectoryPath}/${modelName}`;
+      if (!(await RNFS.exists(modelPath))) {
+        await RNFS.copyFileAssets(modelName, modelPath);
+      }
+      const loaded = await ort.InferenceSession.create(modelPath);
+      setSession(loaded);
+      console.log('✅ ONNX model loaded');
+
+      const refPath = `${RNFS.DocumentDirectoryPath}/ref.jpg`;
+      await RNFS.downloadFile({ fromUrl: REFERENCE_IMAGE_URL, toFile: refPath }).promise;
+
+      const embedding = await detectAndRun(loaded, refPath, setRefFaceUri);
+      if (embedding) setRefEmbedding(embedding);
+    } catch (err) {
+      console.error('❌ Init failed', err);
+    }
+  };
 
   const pickUserImage = async () => {
     const res = await launchImageLibrary({ mediaType: 'photo' });
