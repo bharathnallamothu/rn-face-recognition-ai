@@ -352,9 +352,148 @@ const App = () => {
 };
 
 const styles = StyleSheet.create({
-  container: { padding: 20, alignItems: 'center', justifyContent: 'center' },
-  title: { fontSize: 20, marginBottom: 16 },
-  image: { width: 160, height: 160, margin: 8, borderRadius: 8 },
+  container: {
+    padding: 20,
+    alignItems: 'center',
+    justifyContent: 'center',
+    flexGrow: 1,
+    backgroundColor: '#f5f5f5',
+  },
+  title: {
+    fontSize: 24,
+    fontWeight: 'bold',
+    marginBottom: 20,
+    textAlign: 'center',
+    color: '#333',
+  },
+  imageContainer: {
+    alignItems: 'center',
+    marginBottom: 15,
+  },
+  imageLabel: {
+    fontSize: 16,
+    fontWeight: '600',
+    marginBottom: 5,
+    color: '#666',
+  },
+  image: {
+    width: 160,
+    height: 160,
+    borderRadius: 8,
+    borderWidth: 2,
+    borderColor: '#ddd',
+  },
+  buttonContainer: {
+    marginTop: 20,
+    width: '100%',
+  },
+  primaryButton: {
+    backgroundColor: '#007AFF',
+    padding: 15,
+    borderRadius: 10,
+    marginBottom: 10,
+    alignItems: 'center',
+  },
+  primaryButtonText: {
+    color: 'white',
+    fontSize: 18,
+    fontWeight: '600',
+  },
+  secondaryButton: {
+    backgroundColor: '#6C757D',
+    padding: 15,
+    borderRadius: 10,
+    alignItems: 'center',
+    marginBottom: 10,
+  },
+  secondaryButtonText: {
+    color: 'white',
+    fontSize: 16,
+    fontWeight: '500',
+  },
+  info: {
+    marginTop: 20,
+    padding: 15,
+    backgroundColor: '#e9ecef',
+    borderRadius: 8,
+    fontSize: 14,
+    color: '#495057',
+    textAlign: 'center',
+  },
+  // Camera styles
+  cameraContainer: {
+    flex: 1,
+    backgroundColor: 'black',
+  },
+  camera: {
+    flex: 1,
+  },
+  cameraOverlay: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    justifyContent: 'space-between',
+  },
+  topControls: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    paddingTop: 50,
+    paddingHorizontal: 20,
+  },
+  bottomControls: {
+    flexDirection: 'row',
+    justifyContent: 'space-around',
+    alignItems: 'center',
+    paddingBottom: 50,
+    paddingHorizontal: 20,
+  },
+  controlButton: {
+    backgroundColor: 'rgba(0, 0, 0, 0.6)',
+    padding: 12,
+    borderRadius: 25,
+    minWidth: 50,
+    alignItems: 'center',
+  },
+  controlText: {
+    color: 'white',
+    fontSize: 16,
+    fontWeight: '600',
+  },
+  captureButton: {
+    backgroundColor: '#FF3B30',
+    width: 70,
+    height: 70,
+    borderRadius: 35,
+    justifyContent: 'center',
+    alignItems: 'center',
+    borderWidth: 3,
+    borderColor: 'white',
+  },
+  captureButtonDisabled: {
+    backgroundColor: '#666',
+  },
+  captureText: {
+    fontSize: 24,
+    color: 'white',
+  },
+  matchResultOverlay: {
+    position: 'absolute',
+    top: '50%',
+    left: 20,
+    right: 20,
+    backgroundColor: 'rgba(0, 0, 0, 0.8)',
+    padding: 10,
+    borderRadius: 8,
+    alignItems: 'center',
+  },
+  matchResultText: {
+    color: 'white',
+    fontSize: 18,
+    fontWeight: 'bold',
+    textAlign: 'center',
+  },
 });
 
 export default App;
