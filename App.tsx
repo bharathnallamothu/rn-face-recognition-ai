@@ -90,27 +90,7 @@ const App = () => {
     }
   };
 
-  const processFrameForFaceMatch = useCallback(async (imagePath: string) => {
-    if (!session || !refEmbedding || isProcessing) return;
-    
-    setIsProcessing(true);
-    try {
-      const userEmbedding = await detectAndRun(session, imagePath, () => {});
-      if (userEmbedding) {
-        const similarity = cosineSimilarity(userEmbedding, refEmbedding);
-        const isMatch = similarity > 0.7;
-        const result = isMatch ? '✅ Match Found!' : '❌ No Match';
-        setLastMatchResult(`${result} (${similarity.toFixed(3)})`);
-        
-        if (isMatch && realTimeMatching) {
-          Alert.alert('✅ Face Matched!', `Similarity: ${similarity.toFixed(3)}`);
-        }
-      }
-    } catch (error) {
-      console.log('Frame processing error:', error);
-    }
-    setIsProcessing(false);
-  }, [session, refEmbedding, isProcessing, realTimeMatching]);
+
 
   const takePicture = async () => {
     if (!cameraRef.current) return;
