@@ -205,7 +205,6 @@ const App = () => {
 
   const toggleCamera = () => {
     setShowCamera(!showCamera);
-    setLastMatchResult(null);
   };
 
   const switchCamera = () => {
@@ -214,11 +213,6 @@ const App = () => {
 
   const toggleFlash = () => {
     setFlashMode(prev => prev === 'off' ? 'on' : 'off');
-  };
-
-  const toggleRealTimeMatching = () => {
-    setRealTimeMatching(prev => !prev);
-    setLastMatchResult(null);
   };
 
   if (cameraPermission !== 'granted') {
