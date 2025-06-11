@@ -303,8 +303,8 @@ const App = () => {
         • Real-time camera preview{'\n'}
         • Switch front/back cameras{'\n'}
         • Flash control{'\n'}
-        • Live face matching{'\n'}
-        • High-quality photo capture
+        • High-quality photo capture{'\n'}
+        • Advanced face recognition
       </Text>
     </ScrollView>
   );
