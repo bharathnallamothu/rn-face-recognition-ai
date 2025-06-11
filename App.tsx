@@ -96,7 +96,54 @@ const App = () => {
     }
   };
 
-  const pickUserImage = async () => {
+  const processFrameForFaceMatch = useCallback(async (imagePath: string) => {
+    if (!session || !refEmbedding || isProcessing) return;
+    
+    setIsProcessing(true);
+    try {
+      const userEmbedding = await detectAndRun(session, imagePath, () => {});
+      if (userEmbedding) {
+        const similarity = cosineSimilarity(userEmbedding, refEmbedding);
+        const isMatch = similarity > 0.7;
+        const result = isMatch ? '✅ Match Found!' : '❌ No Match';
+        setLastMatchResult(`${result} (${similarity.toFixed(3)})`);
+        
+        if (isMatch && realTimeMatching) {
+          Alert.alert('✅ Face Matched!', `Similarity: ${similarity.toFixed(3)}`);
+        }
+      }
+    } catch (error) {
+      console.log('Frame processing error:', error);
+    }
+    setIsProcessing(false);
+  }, [session, refEmbedding, isProcessing, realTimeMatching]);
+
+  const takePicture = async () => {
+    if (!cameraRef.current) return;
+    
+    try {
+      setLoading(true);
+      const photo = await cameraRef.current.takePhoto({
+        qualityPrioritization: 'balanced',
+        flash: flashMode,
+      });
+      
+      const userEmbedding = await detectAndRun(session!, photo.path, setUserFaceUri);
+      if (userEmbedding && refEmbedding) {
+        const sim = cosineSimilarity(userEmbedding, refEmbedding);
+        console.log('Similarity:', sim);
+        Alert.alert(
+          sim > 0.7 ? '✅ Face Matched' : '❌ Not Matched',
+          `Similarity Score: ${sim.toFixed(3)}`
+        );
+      }
+    } catch (error) {
+      console.error('Take picture error:', error);
+      Alert.alert('Error', 'Failed to take picture');
+    } finally {
+      setLoading(false);
+    }
+  };
     const res = await launchImageLibrary({ mediaType: 'photo' });
     const uri = res.assets?.[0]?.uri;
     if (!uri || !session || !refEmbedding) return;
