@@ -247,14 +247,106 @@ const App = () => {
     setLastMatchResult(null);
   };
 
+  if (cameraPermission !== 'granted') {
+    return (
+      <View style={styles.container}>
+        <Text style={styles.title}>Camera permission required</Text>
+        <Button title="Request Permission" onPress={requestCameraPermission} />
+      </View>
+    );
+  }
+
+  if (showCamera && device) {
+    return (
+      <View style={styles.cameraContainer}>
+        <Camera
+          ref={cameraRef}
+          style={styles.camera}
+          device={device}
+          isActive={true}
+          photo={true}
+        />
+        
+        {/* Camera Controls Overlay */}
+        <View style={styles.cameraOverlay}>
+          <View style={styles.topControls}>
+            <TouchableOpacity style={styles.controlButton} onPress={toggleFlash}>
+              <Text style={styles.controlText}>⚡ {flashMode}</Text>
+            </TouchableOpacity>
+            <TouchableOpacity style={styles.controlButton} onPress={toggleRealTimeMatching}>
+              <Text style={styles.controlText}>{realTimeMatching ? '🔴 Live' : '⚫ Static'}</Text>
+            </TouchableOpacity>
+            <TouchableOpacity style={styles.controlButton} onPress={toggleCamera}>
+              <Text style={styles.controlText}>✕</Text>
+            </TouchableOpacity>
+          </View>
+
+          {lastMatchResult && (
+            <View style={styles.matchResultOverlay}>
+              <Text style={styles.matchResultText}>{lastMatchResult}</Text>
+            </View>
+          )}
+
+          <View style={styles.bottomControls}>
+            <TouchableOpacity style={styles.secondaryButton} onPress={switchCamera}>
+              <Text style={styles.controlText}>🔄</Text>
+            </TouchableOpacity>
+            
+            <TouchableOpacity
+              style={[styles.captureButton, loading && styles.captureButtonDisabled]}
+              onPress={takePicture}
+              disabled={loading}
+            >
+              {loading ? <ActivityIndicator color="white" /> : <Text style={styles.captureText}>📷</Text>}
+            </TouchableOpacity>
+            
+            <TouchableOpacity style={styles.secondaryButton} onPress={pickUserImage}>
+              <Text style={styles.controlText}>🖼️</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+      </View>
+    );
+  }
+
   return (
     <ScrollView contentContainerStyle={styles.container}>
-      <Text style={styles.title}>🧠 Face Match (ONNX)</Text>
-      {refFaceUri && <Image source={{ uri: refFaceUri }} style={styles.image} />}
-      {userFaceUri && <Image source={{ uri: userFaceUri }} style={styles.image} />}
-      <Button title="Pick Image from Gallery" onPress={pickUserImage} />
-      <Button title="Capture from Camera" onPress={captureFromCamera} />
-      {loading && <ActivityIndicator size="large" color="#00f" style={{ marginTop: 20 }} />}
+      <Text style={styles.title}>🧠 Face Match with Vision Camera</Text>
+      
+      {refFaceUri && (
+        <View style={styles.imageContainer}>
+          <Text style={styles.imageLabel}>Reference Face:</Text>
+          <Image source={{ uri: refFaceUri }} style={styles.image} />
+        </View>
+      )}
+      
+      {userFaceUri && (
+        <View style={styles.imageContainer}>
+          <Text style={styles.imageLabel}>User Face:</Text>
+          <Image source={{ uri: userFaceUri }} style={styles.image} />
+        </View>
+      )}
+
+      <View style={styles.buttonContainer}>
+        <TouchableOpacity style={styles.primaryButton} onPress={toggleCamera}>
+          <Text style={styles.primaryButtonText}>📱 Open Vision Camera</Text>
+        </TouchableOpacity>
+        
+        <TouchableOpacity style={[styles.secondaryButton, {backgroundColor: '#28a745'}]} onPress={pickUserImage}>
+          <Text style={styles.secondaryButtonText}>🖼️ Pick from Gallery</Text>
+        </TouchableOpacity>
+      </View>
+
+      {loading && <ActivityIndicator size="large" color="#007AFF" style={{ marginTop: 20 }} />}
+      
+      <Text style={styles.info}>
+        Vision Camera Features:{'\n'}
+        • Real-time camera preview{'\n'}
+        • Switch front/back cameras{'\n'}
+        • Flash control{'\n'}
+        • Live face matching{'\n'}
+        • High-quality photo capture
+      </Text>
     </ScrollView>
   );
 };
