@@ -163,24 +163,7 @@ const App = () => {
     }
   };
 
-  const captureFromCamera = async () => {
-    const res = await launchCamera({ mediaType: 'photo' });
-    const uri = res.assets?.[0]?.uri;
-    if (!uri || !session || !refEmbedding) return;
 
-    setLoading(true);
-    const userEmbedding = await detectAndRun(session, uri, setUserFaceUri);
-    setLoading(false);
-
-    if (userEmbedding) {
-      const sim = cosineSimilarity(userEmbedding, refEmbedding);
-      console.log('Similarity:', sim);
-      Alert.alert(
-        sim > 0.7 ? '✅ Face Matched' : '❌ Not Matched',
-        `Similarity Score: ${sim.toFixed(3)}`
-      );
-    }
-  };
 
   const detectAndRun = async (
     session: ort.InferenceSession,
