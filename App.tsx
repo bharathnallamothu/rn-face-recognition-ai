@@ -39,6 +39,17 @@ const App = () => {
   const [refFaceUri, setRefFaceUri] = useState<string | null>(null);
   const [userFaceUri, setUserFaceUri] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
+  const [cameraPermission, setCameraPermission] = useState<string>('not-determined');
+  const [showCamera, setShowCamera] = useState(false);
+  const [cameraPosition, setCameraPosition] = useState<'front' | 'back'>('front');
+  const [isProcessing, setIsProcessing] = useState(false);
+  const [flashMode, setFlashMode] = useState<'off' | 'on'>('off');
+  const [realTimeMatching, setRealTimeMatching] = useState(false);
+  const [lastMatchResult, setLastMatchResult] = useState<string | null>(null);
+
+  const devices = useCameraDevices();
+  const device = cameraPosition === 'front' ? devices.front : devices.back;
+  const cameraRef = useRef<Camera>(null);
 
   useEffect(() => {
     (async () => {
