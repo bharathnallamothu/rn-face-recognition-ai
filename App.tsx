@@ -229,6 +229,24 @@ const App = () => {
     return dot / (magA * magB);
   };
 
+  const toggleCamera = () => {
+    setShowCamera(!showCamera);
+    setLastMatchResult(null);
+  };
+
+  const switchCamera = () => {
+    setCameraPosition(prev => prev === 'front' ? 'back' : 'front');
+  };
+
+  const toggleFlash = () => {
+    setFlashMode(prev => prev === 'off' ? 'on' : 'off');
+  };
+
+  const toggleRealTimeMatching = () => {
+    setRealTimeMatching(prev => !prev);
+    setLastMatchResult(null);
+  };
+
   return (
     <ScrollView contentContainerStyle={styles.container}>
       <Text style={styles.title}>🧠 Face Match (ONNX)</Text>
