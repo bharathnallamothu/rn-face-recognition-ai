@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useCallback, useRef } from 'react';
 import {
   Text,
   StyleSheet,
@@ -7,13 +7,25 @@ import {
   Alert,
   ActivityIndicator,
   ScrollView,
+  View,
+  TouchableOpacity,
+  Dimensions,
+  PermissionsAndroid,
+  Platform,
 } from 'react-native';
 import * as ort from 'onnxruntime-react-native';
 import RNFS from 'react-native-fs';
-import { launchImageLibrary, launchCamera } from 'react-native-image-picker';
+import { launchImageLibrary } from 'react-native-image-picker';
 import FaceDetection from '@react-native-ml-kit/face-detection';
 import jpeg from 'jpeg-js';
 import { Buffer } from 'buffer';
+import {
+  Camera,
+  useCameraDevices,
+  useFrameProcessor,
+  runOnUI,
+  runOnJS,
+} from 'react-native-vision-camera';
 
 const INPUT_WIDTH = 160;
 const INPUT_HEIGHT = 160;
