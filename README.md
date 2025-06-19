@@ -27,7 +27,7 @@ A React Native face recognition app using faceNet ONNX model for face matching.
    ```
 
 2. Download faceNet model:
-   - Download the faceNet ONNX model from [here](https://drive.google.com/drive/folders/1-Lx_yJa5eiQ8WJJQRhmbYJ_K-JQq4f5B?usp=sharing)
+   - Download the faceNet ONNX model from [GitHub](https://github.com/NicolasSM-001/faceNet.onnx-)
    - Place the `faceNet.onnx` file in `android/app/src/main/assets/`
 
 3. Start Android:
@@ -75,3 +75,11 @@ Key packages:
 ## License
 
 MIT (or your license here)
+
+---
+
+## Contact
+
+- Email: bharath.nallamothu@gmail.com
+- LinkedIn: [Bharath Nallamothu](https://www.linkedin.com/in/bharath-nallamothu-54664188/)
+- Website: [iambharath.dev](https://iambharath.dev/)
