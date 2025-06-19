@@ -17,7 +17,6 @@ import { Buffer } from 'buffer';
 
 const INPUT_WIDTH = 160;
 const INPUT_HEIGHT = 160;
-const REFERENCE_IMAGE_URL = 'https://ctrlfaceapiimages.s3.ap-south-1.amazonaws.com/2.jpeg';
 
 const App = () => {
   const [session, setSession] = useState<ort.InferenceSession | null>(null);
@@ -26,6 +25,7 @@ const App = () => {
   const [userFaceUri, setUserFaceUri] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
 
+  // Load ONNX model on mount
   useEffect(() => {
     (async () => {
       try {
@@ -37,53 +37,82 @@ const App = () => {
         const loaded = await ort.InferenceSession.create(modelPath);
         setSession(loaded);
         console.log('✅ ONNX model loaded');
-
-        const refPath = `${RNFS.DocumentDirectoryPath}/ref.jpg`;
-        await RNFS.downloadFile({ fromUrl: REFERENCE_IMAGE_URL, toFile: refPath }).promise;
-
-        const embedding = await detectAndRun(loaded, refPath, setRefFaceUri);
-        if (embedding) setRefEmbedding(embedding);
       } catch (err) {
-        console.error('❌ Init failed', err);
+        console.error('❌ Model load failed', err);
       }
     })();
   }, []);
 
+  // Pick reference image from gallery
+  const pickReferenceImage = async () => {
+    if (!session) return;
+    setLoading(true);
+    setRefEmbedding(null);
+    setRefFaceUri(null);
+    setUserFaceUri(null);
+    try {
+      const res = await launchImageLibrary({ mediaType: 'photo' });
+      const uri = res.assets?.[0]?.uri;
+      if (!uri) throw new Error('No image selected');
+      const embedding = await detectAndRun(session, uri, setRefFaceUri);
+      if (embedding) setRefEmbedding(embedding);
+      else Alert.alert('Error', 'No face detected in reference image.');
+    } catch (err) {
+      console.error('❌ Reference image failed:', err);
+      Alert.alert('Error', 'Failed to process reference image.');
+    }
+    setLoading(false);
+  };
+
+  // Pick user/source image from gallery
   const pickUserImage = async () => {
-    const res = await launchImageLibrary({ mediaType: 'photo' });
-    const uri = res.assets?.[0]?.uri;
-    if (!uri || !session || !refEmbedding) return;
-
+    if (!session || !refEmbedding) return;
     setLoading(true);
-    const userEmbedding = await detectAndRun(session, uri, setUserFaceUri);
-    setLoading(false);
-
-    if (userEmbedding) {
-      const sim = cosineSimilarity(userEmbedding, refEmbedding);
-      console.log('Similarity:', sim);
-      Alert.alert(sim > 0.7 ? '✅ Face Matched' : '❌ Not Matched', `Similarity Score: ${sim.toFixed(3)}`);
+    setUserFaceUri(null);
+    try {
+      const res = await launchImageLibrary({ mediaType: 'photo' });
+      const uri = res.assets?.[0]?.uri;
+      if (!uri) throw new Error('No image selected');
+      const userEmbedding = await detectAndRun(session, uri, setUserFaceUri);
+      if (userEmbedding) {
+        const sim = cosineSimilarity(userEmbedding, refEmbedding);
+        console.log('Similarity:', sim);
+        Alert.alert(sim > 0.7 ? '✅ Face Matched' : '❌ Not Matched', `Similarity Score: ${sim.toFixed(3)}`);
+      } else {
+        Alert.alert('Error', 'No face detected in source image.');
+      }
+    } catch (err) {
+      console.error('❌ Source image failed:', err);
+      Alert.alert('Error', 'Failed to process source image.');
     }
+    setLoading(false);
   };
 
+  // Capture user/source image from camera
   const captureFromCamera = async () => {
-    const res = await launchCamera({ mediaType: 'photo' });
-    const uri = res.assets?.[0]?.uri;
-    if (!uri || !session || !refEmbedding) return;
-
+    if (!session || !refEmbedding) return;
     setLoading(true);
-    const userEmbedding = await detectAndRun(session, uri, setUserFaceUri);
-    setLoading(false);
-
-    if (userEmbedding) {
-      const sim = cosineSimilarity(userEmbedding, refEmbedding);
-      console.log('Similarity:', sim);
-      Alert.alert(
-        sim > 0.7 ? '✅ Face Matched' : '❌ Not Matched',
-        `Similarity Score: ${sim.toFixed(3)}`
-      );
+    setUserFaceUri(null);
+    try {
+      const res = await launchCamera({ mediaType: 'photo' });
+      const uri = res.assets?.[0]?.uri;
+      if (!uri) throw new Error('No image captured');
+      const userEmbedding = await detectAndRun(session, uri, setUserFaceUri);
+      if (userEmbedding) {
+        const sim = cosineSimilarity(userEmbedding, refEmbedding);
+        console.log('Similarity:', sim);
+        Alert.alert(sim > 0.7 ? '✅ Face Matched' : '❌ Not Matched', `Similarity Score: ${sim.toFixed(3)}`);
+      } else {
+        Alert.alert('Error', 'No face detected in source image.');
+      }
+    } catch (err) {
+      console.error('❌ Source image failed:', err);
+      Alert.alert('Error', 'Failed to process source image.');
     }
+    setLoading(false);
   };
 
+  // Face detection and embedding
   const detectAndRun = async (
     session: ort.InferenceSession,
     imgPath: string,
@@ -97,9 +126,6 @@ const App = () => {
 
       const { width, height, left, top } = face.frame;
       if (width <= 0 || height <= 0) throw new Error('Invalid bounding box');
-
-      // const croppedName = `cropped_${Date.now()}.jpg`;
-      // const croppedPath = `${RNFS.CachesDirectoryPath}/${croppedName}`;
 
       const { default: ImageEditor } = await import('@react-native-community/image-editor');
       const crop = {
@@ -141,6 +167,7 @@ const App = () => {
     }
   };
 
+  // Cosine similarity
   const cosineSimilarity = (a: Float32Array, b: Float32Array) => {
     const dot = a.reduce((acc, val, i) => acc + val * b[i], 0);
     const magA = Math.sqrt(a.reduce((acc, val) => acc + val * val, 0));
@@ -151,11 +178,45 @@ const App = () => {
   return (
     <ScrollView contentContainerStyle={styles.container}>
       <Text style={styles.title}>🧠 Face Match (ONNX)</Text>
-      {refFaceUri && <Image source={{ uri: refFaceUri }} style={styles.image} />}
-      {userFaceUri && <Image source={{ uri: userFaceUri }} style={styles.image} />}
-      <Button title="Pick Image from Gallery" onPress={pickUserImage} />
-      <Button title="Capture from Camera" onPress={captureFromCamera} />
+      <Button title="Pick Reference Image (Gallery)" onPress={pickReferenceImage} />
+      {refFaceUri && (
+        <>
+          <Text style={{ marginTop: 8, marginBottom: 4 }}>Reference Face:</Text>
+          <Image source={{ uri: refFaceUri }} style={styles.image} />
+        </>
+      )}
+      <Button
+        title="Pick Source Image (Gallery)"
+        onPress={pickUserImage}
+        disabled={!refEmbedding || loading}
+      />
+      <Button
+        title="Capture Source Image (Camera)"
+        onPress={captureFromCamera}
+        disabled={!refEmbedding || loading}
+      />
+      {userFaceUri && (
+        <>
+          <Text style={{ marginTop: 8, marginBottom: 4 }}>Source Face:</Text>
+          <Image source={{ uri: userFaceUri }} style={styles.image} />
+        </>
+      )}
       {loading && <ActivityIndicator size="large" color="#00f" style={{ marginTop: 20 }} />}
+      <Button
+        title="Try Another Match"
+        onPress={() => setUserFaceUri(null)}
+        disabled={!refEmbedding || loading || !userFaceUri}
+      />
+      <Button
+        title="Reset"
+        color="#d9534f"
+        onPress={() => {
+          setRefEmbedding(null);
+          setRefFaceUri(null);
+          setUserFaceUri(null);
+        }}
+        disabled={loading && !refFaceUri && !userFaceUri}
+      />
     </ScrollView>
   );
 };
