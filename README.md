@@ -1,7 +1,7 @@
 # faceReg
 
 A React Native face recognition app using faceNet ONNX model for face matching.  
-**Note:** Android only.
+**Note:** Android only. All face matching happens fully on-device—no APIs or backend required.
 
 ## Features
 
@@ -52,6 +52,7 @@ A React Native face recognition app using faceNet ONNX model for face matching.
 - Image processing with react-native-image-editor
 - Cosine similarity for face matching
 - Threshold of 0.7 for match determination
+- **All processing is done on-device. No network calls or backend required.**
 
 ## Model Integration
 
