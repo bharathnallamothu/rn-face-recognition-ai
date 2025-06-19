@@ -1,103 +1,76 @@
 # faceReg
 
-**faceReg** is a React Native app for face recognition using the faceNet ONNX model.  
-**Note:** This app only works on **Android**.
-
----
+A React Native face recognition app using faceNet ONNX model for face matching.  
+**Note:** Android only.
 
 ## Features
 
-- Face detection and recognition using ONNX faceNet model (runs fully on-device)
-- Compare a user's face with a reference image (from a URL or from your gallery)
-- Pick an image from the gallery or capture from the camera
-- Simple UI for demo/testing
+- Face detection and recognition using on-device ONNX model
+- Pick reference image from gallery
+- Compare faces using gallery images or camera capture
+- Real-time face matching with similarity scores
+- Simple, intuitive UI
 
----
-
-## Requirements
+## Prerequisites
 
 - Node.js >= 18
-- Yarn (recommended) or npm
-- Android Studio (for emulator or device deployment)
-- Android device or emulator (iOS is **not supported**)
+- Android Studio
+- Android device or emulator
 
----
+## Quick Start
 
-## Installation & Running
-
-1. **Clone the repository:**
+1. Clone and install:
    ```sh
    git clone <repo-url>
    cd faceReg
+   yarn install
    ```
 
-2. **Install dependencies:**
-   ```sh
-   yarn
-   # or
-   npm install
-   ```
+2. Download faceNet model:
+   - Download the faceNet ONNX model from [here](https://drive.google.com/drive/folders/1-Lx_yJa5eiQ8WJJQRhmbYJ_K-JQq4f5B?usp=sharing)
+   - Place the `faceNet.onnx` file in `android/app/src/main/assets/`
 
-3. **(Optional) Clean previous Android builds:**
-   ```sh
-   cd android && ./gradlew clean && cd ..
-   ```
-
-4. **Run the app on Android:**
+3. Start Android:
    ```sh
    yarn android
-   # or
-   npm run android
    ```
 
----
+## Usage
 
-## Configuration
+1. Tap "Pick Reference Image" to select your reference face from gallery
+2. Choose comparison method:
+   - "Pick Source Image" to select from gallery
+   - "Capture Source Image" to use camera
+3. View match results with similarity score
+4. Use "Try Another Match" for new comparisons
+5. "Reset" to start over with new reference image
 
-- The reference image for face comparison is set in `App.tsx`:
-  ```js
-  const REFERENCE_IMAGE_URL = 'https://ctrlfaceapiimages.s3.ap-south-1.amazonaws.com/2.jpeg';
-  ```
-  Replace this URL with your own image if needed.
+## Technical Details
 
-- **Alternatively, you can modify the code to allow picking the reference image from your gallery instead of using a URL.**
-  This is recommended for public repo users who do not want to use a public S3 image. You can add a button or UI to pick the reference image and set it in state, similar to how user images are picked.
+- Uses faceNet ONNX model for face embeddings (160x160 input size)
+- Face detection via ML Kit
+- Image processing with react-native-image-editor
+- Cosine similarity for face matching
+- Threshold of 0.7 for match determination
 
-- The ONNX model file (`faceNet.onnx`) is included in the Android assets and is loaded automatically.
+## Model Integration
 
----
+The app uses the faceNet ONNX model for face recognition:
 
-## How it works
-
-- On launch, the app downloads the reference image (if using a URL) and computes its face embedding.
-- The user can pick or capture a photo; the app detects the face, crops it, and computes its embedding.
-- The app compares the embeddings using cosine similarity and shows if the faces match.
-- **If you use a gallery image as the reference, the app will use that image for comparison instead of downloading from a URL.**
-
----
+1. The model is stored in `android/app/src/main/assets/faceNet.onnx`
+2. On first launch, the model is copied to the app's document directory
+3. ONNX runtime loads and runs the model for inference
+4. Input faces are preprocessed to 160x160 pixels
+5. Model outputs 512-dimensional face embeddings
+6. Cosine similarity is used to compare embeddings
 
 ## Dependencies
 
-- `react-native`
-- `onnxruntime-react-native`
-- `@react-native-ml-kit/face-detection`
-- `@react-native-community/image-editor`
-- `react-native-fs`
-- `react-native-image-picker`
-- `jpeg-js`
-
-See `package.json` for full details.
-
----
-
-## Notes
-
-- **iOS is not supported.** The ONNX model and face detection are only set up for Android.
-- The app requires internet access to download the reference image (unless you use a local asset or gallery image).
-- The app requests camera and storage permissions as needed.
-- For public repo users, using a gallery image as the reference is recommended for privacy and flexibility.
-
----
+Key packages:
+- onnxruntime-react-native
+- @react-native-ml-kit/face-detection
+- react-native-image-picker
+- react-native-fs
 
 ## License
 
